@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>GlassTube</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <img src="../icons/icon32.png" alt="" width="24" height="24" />
+    <h1>GlassTube</h1>
+  </header>
+
+  <label class="row">
+    <span>
+      <strong>Block ads</strong>
+      <small>Skips video ads and hides ad slots</small>
+    </span>
+    <input type="checkbox" id="blockAds" />
+  </label>
+
+  <label class="row">
+    <span>
+      <strong>Transparent page</strong>
+      <small>Video plays behind the watch page (Alt+T)</small>
+    </span>
+    <input type="checkbox" id="transparentMode" />
+  </label>
+
+  <div class="row column">
+    <span><strong>Transparency</strong> <output id="transparencyValue"></output></span>
+    <input type="range" id="transparency" min="0" max="1" step="0.05" />
+  </div>
+
+  <div class="row column">
+    <span><strong>Panel blur</strong> <output id="blurValue"></output></span>
+    <input type="range" id="blur" min="0" max="30" step="1" />
+  </div>
+
+  <p class="hint">Reload open YouTube tabs after installing or updating.</p>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+/* ===== Ads: hide ad slots across YouTube ===== */
+html.dyt-hide-ads :is(
+  ytd-ad-slot-renderer,
+  ytd-in-feed-ad-layout-renderer,
+  ytd-promoted-sparkles-web-renderer,
+  ytd-promoted-video-renderer,
+  ytd-display-ad-renderer,
+  ytd-companion-slot-renderer,
+  ytd-banner-promo-renderer,
+  ytd-statement-banner-renderer,
+  ytd-rich-item-renderer:has(ytd-ad-slot-renderer),
+  ytd-rich-section-renderer:has(ytd-statement-banner-renderer),
+  #player-ads,
+  #masthead-ad,
+  .ytp-ad-overlay-container,
+  .ytp-ad-overlay-slot
+) {
+  display: none !important;
+}
+
+/* ===== Transparent page: a copy of the video plays behind see-through content ===== */
+html.dyt-transparent,
+html.dyt-transparent [dark],
+html.dyt-transparent ytd-masthead {
+  --yt-spec-base-background: transparent !important;
+  --yt-spec-general-background-a: transparent !important;
+  --yt-spec-general-background-b: transparent !important;
+  --yt-spec-general-background-c: transparent !important;
+  --yt-spec-brand-background-solid: transparent !important;
+  --yt-spec-brand-background-primary: transparent !important;
+}
+html.dyt-transparent {
+  background: #0f0f0f !important;
+  --dyt-panel-rgb: 15, 15, 15;
+}
+html.dyt-transparent:not([dark]) {
+  background: #fff !important;
+  --dyt-panel-rgb: 255, 255, 255;
+}
+html.dyt-transparent :is(body, ytd-app, ytd-page-manager, ytd-watch-flexy, #columns, ytd-masthead #background) {
+  background: transparent !important;
+}
+
+html.dyt-transparent :is(#cinematics, #cinematics-container) {
+  display: none !important;
+}
+/* Keep the page above the background copy. */
+html.dyt-transparent ytd-app {
+  position: relative;
+  z-index: 1;
+}
+
+/* Muted live copy of the video, fixed behind the whole page. */
+.dyt-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  display: none;
+}
+html.dyt-transparent .dyt-backdrop {
+  display: block;
+}
+.dyt-backdrop video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* See-through panels; alpha comes from the Transparency slider. */
+html.dyt-transparent ytd-watch-flexy :is(#below, #secondary-inner),
+html.dyt-transparent #masthead-container {
+  background: rgba(var(--dyt-panel-rgb), var(--dyt-panel-alpha, 0.45)) !important;
+  backdrop-filter: blur(var(--dyt-panel-blur, 0px));
+}
+html.dyt-transparent ytd-watch-flexy :is(#below, #secondary-inner) {
+  border-radius: 12px;
+}
