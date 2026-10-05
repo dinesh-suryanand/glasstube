@@ -1,7 +1,6 @@
 // GlassTube: ad blocking + transparent watch page.
-// The normal YouTube player stays untouched; a muted live copy of the video
-// (captureStream, so it pauses/seeks with the real player) plays behind the
-// see-through page (see content.css).
+// The normal YouTube player stays untouched; its frames are painted onto a
+// canvas behind the see-through page (see content.css).
 // YouTube enforces Trusted Types, so all DOM is built without innerHTML.
 (() => {
   const DEFAULTS = { blockAds: true, transparentMode: true, transparency: 0.55, blur: 0 };
@@ -46,37 +45,60 @@
   }
 
   // ---------- Transparent page (background copy) ----------
+  // Each new frame of the real video is painted onto a canvas behind the page
+  // (like YouTube's own Ambient mode). requestVideoFrameCallback only fires on
+  // new frames, so pausing the video freezes the background too.
+  // Note: video.captureStream() is NOT used — it stops Chrome drawing the
+  // original player.
 
-  let backdropVideo = null;
-  let captureFailedSrc = null;
+  const MAX_BACKDROP_WIDTH = 640; // low-res is plenty for a full-page background
+  let backdrop = null; // { canvas, ctx, video, handle, lastDraw }
 
-  const hasLiveStream = (v) => v.srcObject?.getVideoTracks().some((t) => t.readyState === 'live');
+  function paint() {
+    if (!backdrop) return;
+    const { canvas, ctx, video } = backdrop;
+    if (!video.videoWidth) return;
+    const width = Math.min(MAX_BACKDROP_WIDTH, video.videoWidth);
+    const height = Math.round((width * video.videoHeight) / video.videoWidth);
+    if (canvas.width !== width || canvas.height !== height) Object.assign(canvas, { width, height });
+    // Copy-protected (DRM) videos just draw black, leaving a plain dark page.
+    ctx.drawImage(video, 0, 0, width, height);
+    backdrop.lastDraw = performance.now();
+  }
+
+  function onVideoFrame() {
+    paint();
+    if (backdrop) backdrop.handle = backdrop.video.requestVideoFrameCallback(onVideoFrame);
+  }
+
+  function removeBackdrop() {
+    if (!backdrop) return;
+    backdrop.video.cancelVideoFrameCallback(backdrop.handle);
+    backdrop.video.removeEventListener('seeked', paint);
+    backdrop.canvas.remove();
+    backdrop = null;
+  }
 
   function updateTransparentMode() {
     const video = getVideo();
     const active = settings.transparentMode && location.pathname === '/watch' && !!video && !!document.body;
     root.classList.toggle('dyt-transparent', active);
     if (!active) {
-      backdropVideo?.parentElement.remove();
-      backdropVideo = null;
+      removeBackdrop();
       return;
     }
-    if (!backdropVideo) {
-      const wrap = document.createElement('div');
-      wrap.className = 'dyt-backdrop';
-      backdropVideo = document.createElement('video');
-      Object.assign(backdropVideo, { muted: true, autoplay: true, playsInline: true });
-      wrap.append(backdropVideo);
-      document.body.prepend(wrap);
+    if (backdrop?.video === video) {
+      // Fallback in case frame callbacks stall (e.g. Chrome throttling).
+      if (!video.paused && performance.now() - backdrop.lastDraw > 500) paint();
+      return;
     }
-    if (hasLiveStream(backdropVideo) || video.readyState < 2 || captureFailedSrc === video.src) return;
-    try {
-      backdropVideo.srcObject = video.captureStream();
-      backdropVideo.play().catch(() => {});
-    } catch (err) {
-      // DRM-protected videos can't be captured; the page stays plain dark.
-      captureFailedSrc = video.src;
-    }
+    removeBackdrop();
+    const canvas = document.createElement('canvas');
+    canvas.className = 'dyt-backdrop';
+    document.body.prepend(canvas);
+    backdrop = { canvas, ctx: canvas.getContext('2d'), video, handle: 0, lastDraw: 0 };
+    video.addEventListener('seeked', paint); // seeking while paused updates the background
+    onVideoFrame();
   }
 
   // ---------- Wiring ----------

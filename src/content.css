@@ -44,36 +44,37 @@ html.dyt-transparent :is(body, ytd-app, ytd-page-manager, ytd-watch-flexy, #colu
 html.dyt-transparent :is(#cinematics, #cinematics-container) {
   display: none !important;
 }
-/* Keep the page above the background copy. */
-html.dyt-transparent ytd-app {
-  position: relative;
-  z-index: 1;
-}
 
-/* Muted live copy of the video, fixed behind the whole page. */
+/* Canvas copy of the video, fixed behind the whole page. z-index -1 puts it
+   under all page content without changing YouTube's own stacking. */
 .dyt-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-  display: none;
-}
-html.dyt-transparent .dyt-backdrop {
-  display: block;
-}
-.dyt-backdrop video {
-  width: 100%;
-  height: 100%;
+  z-index: -1;
+  width: 100vw;
+  height: 100vh;
   object-fit: cover;
+  pointer-events: none;
 }
 
-/* See-through panels; alpha comes from the Transparency slider. */
-html.dyt-transparent ytd-watch-flexy :is(#below, #secondary-inner),
-html.dyt-transparent #masthead-container {
-  background: rgba(var(--dyt-panel-rgb), var(--dyt-panel-alpha, 0.45)) !important;
+/* See-through panels; alpha comes from the Transparency slider.
+   The tint/blur sits on a ::before layer: putting backdrop-filter on the panel
+   itself would make it the containing block for YouTube's position:fixed
+   menus/dropdowns inside it, throwing them out of place. */
+html.dyt-transparent ytd-watch-flexy :is(#below, #secondary-inner) {
+  position: relative;
+  isolation: isolate;
+}
+html.dyt-transparent ytd-watch-flexy :is(#below, #secondary-inner)::before,
+html.dyt-transparent #masthead-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: rgba(var(--dyt-panel-rgb), var(--dyt-panel-alpha, 0.45));
   backdrop-filter: blur(var(--dyt-panel-blur, 0px));
 }
-html.dyt-transparent ytd-watch-flexy :is(#below, #secondary-inner) {
+html.dyt-transparent ytd-watch-flexy :is(#below, #secondary-inner)::before {
   border-radius: 12px;
 }

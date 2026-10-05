@@ -3,7 +3,7 @@
 **See-through page & ad blocker for YouTube.** A Chrome extension (Manifest V3, plain JavaScript, no build step).
 
 - **Blocks ads**: skips and mutes video ads, hides ad slots, and blocks the main ad requests.
-- **Transparent page**: on a watch page, the normal YouTube player stays where it is with all its own buttons. A muted live copy of the video plays behind the see-through page (header, description, recommendations). The copy follows the real player, so pausing or seeking the video does the same to the background.
+- **Transparent page**: on a watch page, the normal YouTube player stays where it is with all its own buttons. A copy of the video (painted frame by frame onto a canvas) plays behind the see-through page (header, description, recommendations). The copy follows the real player, so pausing or seeking the video does the same to the background.
 
 ## Controls
 
