@@ -2,7 +2,7 @@
 
 **See-through page & ad blocker for YouTube.** A Chrome extension (Manifest V3, plain JavaScript, no build step).
 
-- **Blocks ads**: skips and mutes video ads, hides ad slots, and blocks the main ad requests.
+- **Skips ads**: video ads are muted, played at 16× and skipped, and ad slots on the page are hidden. Ad requests are deliberately *not* blocked: blocking them is what triggers YouTube's "ad blocker detected" wall.
 - **Transparent page**: on a watch page, the normal YouTube player stays where it is with all its own buttons. A copy of the video (painted frame by frame onto a canvas) plays behind the see-through page (header, description, recommendations). The copy follows the real player, so pausing or seeking the video does the same to the background.
 
 ## Controls
@@ -32,7 +32,7 @@ After you change the code, click ↻ on the extension card and reload YouTube.
    ```
 2. Register at https://chrome.google.com/webstore/devconsole. It costs $5 once.
 3. Click **New item**, upload the zip, and fill in the listing: description, icon, a 1280×800 screenshot.
-4. Privacy tab: justify each permission (`storage` = settings, `declarativeNetRequest` = ad blocking, youtube.com = page features). Say you collect no data, and link a simple privacy policy page.
+4. Privacy tab: justify each permission (`storage` = settings, youtube.com = page features). Say you collect no data, and link a simple privacy policy page.
 5. Submit for review. For updates, raise `"version"` in `manifest.json` and upload a new zip.
 
 Note: blocking YouTube ads breaks YouTube's Terms of Service, and the store may reject or remove YouTube ad blockers. YouTube also changes its page often, so selectors will need occasional updates.
@@ -44,6 +44,4 @@ Note: blocking YouTube ads breaks YouTube's Terms of Service, and the store may 
 | `manifest.json` | Extension config (Manifest V3) |
 | `src/content.js` | Ad skipping, transparent mode (background copy) |
 | `src/content.css` | Ad hiding, background copy layout, see-through panels |
-| `src/background.js` | Turns network ad blocking on/off with the setting |
-| `rules/ad_rules.json` | Network block rules for ad domains |
 | `popup/` | Toolbar popup with settings |

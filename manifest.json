@@ -1,13 +1,14 @@
 {
   "manifest_version": 3,
   "name": "GlassTube",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "See-through YouTube watch page with the video playing behind it, plus ad blocking.",
-  "permissions": ["storage", "declarativeNetRequest"],
-  "host_permissions": ["*://*.youtube.com/*"],
-  "background": {
-    "service_worker": "src/background.js"
-  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*"
+  ],
   "action": {
     "default_title": "GlassTube",
     "default_popup": "popup/popup.html",
@@ -26,15 +27,16 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/*"],
-      "js": ["src/content.js"],
-      "css": ["src/content.css"],
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "js": [
+        "src/content.js"
+      ],
+      "css": [
+        "src/content.css"
+      ],
       "run_at": "document_start"
     }
-  ],
-  "declarative_net_request": {
-    "rule_resources": [
-      { "id": "ads", "enabled": true, "path": "rules/ad_rules.json" }
-    ]
-  }
+  ]
 }

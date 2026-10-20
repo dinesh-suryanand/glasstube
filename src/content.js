@@ -30,10 +30,9 @@
         video.muted = true;
         mutedByUs = true;
       }
+      // Ads are fast-forwarded, not blocked or jumped over: blocking ad requests
+      // triggers YouTube's "ad blocker detected" playback wall.
       if (video.playbackRate !== AD_RATE) video.playbackRate = AD_RATE;
-      if (Number.isFinite(video.duration) && video.currentTime < video.duration - 0.25) {
-        video.currentTime = video.duration - 0.1;
-      }
     } else if (!adShowing) {
       if (mutedByUs) {
         video.muted = false;
